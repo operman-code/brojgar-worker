@@ -1,90 +1,174 @@
-# brojgar-worker
-# Overview
+# Brojgar Worker - Job Marketplace Platform
 
-This is a local job marketplace platform called "Brojgar Worker" that connects small businesses with local workers. The application allows businesses to post jobs and workers to find job opportunities in their area. The platform includes features like job posting, worker profiles, skill matching, job boosting for businesses, and a payment system for unlocking job details.
+A complete job marketplace web application connecting small businesses with local workers, built with React, Node.js, Express, and MongoDB.
 
-# User Preferences
+## Features
 
-Preferred communication style: Simple, everyday language.
+### For Workers
+- Register with skills and location
+- Browse jobs in their area
+- Pay ₹20 to unlock full job details and contact information
+- View job history and earnings
 
-# System Architecture
+### For Businesses  
+- Post jobs for free
+- Boost job posts for ₹100 (30 days priority visibility)
+- Manage applications and worker responses
+- Dashboard with analytics and insights
 
-## Frontend Architecture
-- **React + TypeScript** with Vite as the build tool for fast development
-- **Component-based architecture** using functional components and hooks
-- **Routing** implemented with Wouter for lightweight client-side navigation
-- **UI Framework** built with shadcn/ui components and Radix UI primitives
-- **Styling** using Tailwind CSS with custom design tokens and Inter font
-- **State Management** through React Query (@tanstack/react-query) for server state
-- **Form Handling** with React Hook Form and Zod for validation
+## Tech Stack
 
-## Backend Architecture
-- **Node.js with Express** server providing RESTful API endpoints
-- **Monorepo structure** with shared schema and types between client and server
-- **In-memory storage** implementation for development (IStorage interface allows easy database swapping)
-- **Route organization** separating authentication, user management, job management, and payment handling
-- **Middleware** for request logging and JSON parsing
+**Frontend:**
+- React 18 with TypeScript
+- Vite for fast development and building
+- Tailwind CSS for styling
+- shadcn/ui components
+- React Query for state management
+- Wouter for routing
 
-## Data Storage Architecture
-- **PostgreSQL database** configured through Drizzle ORM
-- **Schema-first approach** with shared TypeScript types generated from database schema
-- **Database migrations** managed through Drizzle Kit
-- **Connection** via Neon serverless PostgreSQL (@neondatabase/serverless)
-- **Type safety** ensured through Drizzle-Zod integration for runtime validation
+**Backend:**
+- Node.js with Express
+- TypeScript throughout
+- MongoDB with Mongoose ODM
+- In-memory storage for development
+- RESTful API design
 
-## Key Data Models
-- **Users** - Core user accounts with email authentication and wallet system
-- **Workers** - Extended profiles with skills, experience levels, and ratings
-- **Businesses** - Company profiles with business type and name
-- **Jobs** - Job postings with location, skills, duration, and boost capabilities
-- **Payments** - Transaction tracking for job unlocks and boosts
-- **Applications** - Worker applications to jobs
+**Production Ready:**
+- Docker containerization
+- PM2 process management
+- Nginx reverse proxy
+- SSL certificate automation
+- Security middleware (Helmet, CORS, compression)
 
-## Authentication & Authorization
-- **Simple email/password authentication** stored in user table
-- **Role-based access** distinguishing between 'worker' and 'business' user types
-- **Session management** through Express sessions with PostgreSQL storage
-- **Protected routes** based on user authentication status
+## Quick Start
 
-## Business Logic Features
-- **Skill-based job matching** - Workers see jobs matching their skills and location
-- **Job boosting system** - Businesses can pay to promote their job listings
-- **Job unlocking mechanism** - Workers pay to access full job contact details
-- **Wallet system** - Internal credits for payments and transactions
-- **Rating system** - Worker performance tracking through completed jobs
+### Development Setup
 
-## Development Tools & Configuration
-- **TypeScript** for type safety across the entire stack
-- **ESM modules** throughout the application
-- **Path aliases** configured for clean imports (@/, @shared/)
-- **Development server** with hot module replacement via Vite
-- **Replit integration** with development banner and error overlay
-- **Code quality** through strict TypeScript configuration
+1. **Clone and install:**
+```bash
+git clone <your-repo>
+cd brojgar-worker
+npm install
+```
 
-# External Dependencies
+2. **Start development server:**
+```bash
+npm run dev
+```
 
-## Database & ORM
-- **Neon Database** - Serverless PostgreSQL hosting
-- **Drizzle ORM** - Type-safe database operations and schema management
-- **Drizzle Kit** - Database migration and schema push tools
+3. **Access the application:**
+- Open http://localhost:5000
+- Try registering as a worker or business
+- Test the job posting and unlocking features
 
-## UI & Design
-- **Radix UI** - Headless component primitives for accessibility
-- **shadcn/ui** - Pre-built component library
-- **Tailwind CSS** - Utility-first styling framework
-- **Lucide React** - Icon library
+### Production Deployment on AWS EC2
 
-## State & Forms
-- **TanStack React Query** - Server state management and caching
-- **React Hook Form** - Form state management
-- **Zod** - Runtime type validation and schema definition
+See the complete guide in `deploy/README.md`
 
-## Development
-- **Vite** - Frontend build tool and development server  
-- **TypeScript** - Static type checking
-- **Replit** - Development environment with runtime error handling
+**Quick deployment:**
+1. Launch Ubuntu EC2 instance
+2. Run the automated setup script
+3. Configure MongoDB Atlas connection
+4. Deploy and start the application
 
-## Utilities
-- **date-fns** - Date manipulation and formatting
-- **class-variance-authority** - Utility for conditional CSS classes
-- **clsx & tailwind-merge** - CSS class name utilities
+## Project Structure
+
+```
+brojgar-worker/
+├── client/                 # React frontend
+│   ├── src/
+│   │   ├── components/     # Reusable UI components
+│   │   ├── pages/         # Route components
+│   │   ├── hooks/         # Custom React hooks
+│   │   └── lib/           # Utilities and config
+├── server/                # Node.js backend
+│   ├── models/            # MongoDB schemas
+│   ├── routes.ts          # API endpoints
+│   ├── storage.ts         # In-memory storage
+│   ├── storage-mongodb.ts # MongoDB implementation
+│   └── storage-factory.ts # Storage switching logic
+├── shared/                # Shared TypeScript types
+├── deploy/                # Deployment scripts and docs
+└── dist/                  # Built application (after build)
+```
+
+## Environment Configuration
+
+Copy `.env.example` to `.env` and configure:
+
+```env
+NODE_ENV=production
+USE_MONGODB=true
+MONGODB_URI=mongodb+srv://username:password@cluster.mongodb.net/brojgar-worker
+PORT=5000
+HOST=0.0.0.0
+JWT_SECRET=your-super-secret-jwt-key
+ALLOWED_ORIGINS=https://yourdomain.com
+```
+
+## Available Scripts
+
+- `npm run dev` - Start development server
+- `npm run build` - Build for production
+- `npm run start` - Start production server (with MongoDB)
+- `npm run start:local` - Start production server (in-memory storage)
+
+## Key Features Implementation
+
+### Payment System
+- Wallet-based payments for job unlocks
+- Job boost payments for priority listing
+- Secure transaction handling
+
+### Job Matching
+- Location-based job filtering
+- Skills-based job recommendations
+- Boosted jobs appear first in listings
+
+### User Management
+- Separate registration flows for workers and businesses
+- Profile management and statistics
+- Authentication and session handling
+
+## Database Design
+
+The application uses a flexible storage system:
+- **Development**: Fast in-memory storage
+- **Production**: MongoDB with proper schemas and indexes
+
+### Data Models
+- Users (workers and businesses)
+- Jobs with boost and active status
+- Payments and wallet transactions
+- Job applications and unlocks
+
+## Security Features
+
+- CORS protection
+- Helmet security headers
+- Input validation with Zod
+- Environment-based configuration
+- Rate limiting ready
+
+## Scaling Considerations
+
+- Horizontal scaling with load balancers
+- MongoDB Atlas auto-scaling
+- CDN integration for static assets
+- Caching layer support
+
+## Support
+
+For deployment issues, check:
+1. Server logs: `pm2 logs brojgar-worker`
+2. MongoDB connection in environment variables
+3. Port and firewall configurations
+4. SSL certificate setup
+
+## License
+
+MIT License - feel free to modify and use for your projects.
+
+---
+
+**Ready to deploy on AWS EC2 with MongoDB Atlas!**
