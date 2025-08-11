@@ -6,11 +6,16 @@ import dotenv from "dotenv";
 import { registerRoutes } from "./routes";
 import { setupVite, serveStatic, log } from "./vite";
 import { connectDB } from "./models";
+import { createStorage } from "./storage-factory";
 
 // Load environment variables
 dotenv.config();
 
 const app = express();
+// Lightweight health endpoint
+app.get("/api/health", (_req, res) => {
+  res.json({ status: "ok", useMongoDB: process.env.USE_MONGODB === 'true' && !!process.env.MONGODB_URI });
+});
 
 // Security middleware
 app.use(helmet({
@@ -70,6 +75,9 @@ app.use((req, res, next) => {
   }
   
   const server = await registerRoutes(app);
+
+  const storageType = (process.env.USE_MONGODB === 'true' && process.env.MONGODB_URI) ? 'MongoDB' : 'InMemory';
+  log(`Storage backend: ${storageType}`);
 
   app.use((err: any, _req: Request, res: Response, _next: NextFunction) => {
     const status = err.status || err.statusCode || 500;
