@@ -107,13 +107,30 @@ export class MongoStorage implements IStorage {
   }
 
   async getJobsForWorker(location: string, skills: string[]): Promise<JobType[]> {
+    const locationRegex = new RegExp(location, 'i');
+
     const jobs = await Job.find({
       isActive: true,
-      location: { $regex: location, $options: 'i' },
-      workType: { $in: skills }
-    }).sort({ isBoosted: -1, createdAt: -1 }).lean();
-    
-    return jobs.map(job => this.formatJob(job));
+      location: { $regex: locationRegex },
+    })
+      .sort({ isBoosted: -1, createdAt: -1 })
+      .lean();
+
+    const skillsLower = skills.map((s) => s.toLowerCase());
+    const sorted = jobs.sort((a: any, b: any) => {
+      // Prefer boosted already via db sort, but keep stable preference
+      if (a.isBoosted && !b.isBoosted) return -1;
+      if (!a.isBoosted && b.isBoosted) return 1;
+
+      const aSkill = skillsLower.some((s) => (a.workType || '').toLowerCase().includes(s));
+      const bSkill = skillsLower.some((s) => (b.workType || '').toLowerCase().includes(s));
+      if (aSkill && !bSkill) return -1;
+      if (!aSkill && bSkill) return 1;
+
+      return (new Date(b.createdAt).getTime()) - (new Date(a.createdAt).getTime());
+    });
+
+    return sorted.map(job => this.formatJob(job));
   }
 
   async createJob(jobData: InsertJob): Promise<JobType> {
