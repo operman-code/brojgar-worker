@@ -224,16 +224,30 @@ export class MemStorage implements IStorage {
   }
 
   async getJobsForWorker(location: string, skills: string[]): Promise<Job[]> {
+    const locationLower = location.toLowerCase();
+    const skillsLower = skills.map((s) => s.toLowerCase());
     return Array.from(this.jobs.values())
-      .filter(job => 
-        job.isActive && 
-        job.location.includes(location) &&
-        skills.some(skill => job.workType.includes(skill))
-      )
+      .filter((job) => {
+        if (!job.isActive) return false;
+
+        const jobLocationLower = job.location.toLowerCase();
+        const locationMatches =
+          jobLocationLower.includes(locationLower) ||
+          locationLower.includes(jobLocationLower);
+
+        return locationMatches;
+      })
       .sort((a, b) => {
-        // Boosted jobs first
+        // Prefer boosted
         if (a.isBoosted && !b.isBoosted) return -1;
         if (!a.isBoosted && b.isBoosted) return 1;
+        // Prefer skill matches
+        const aSkill = skillsLower.some((s) => a.workType.toLowerCase().includes(s));
+        const bSkill = skillsLower.some((s) => b.workType.toLowerCase().includes(s));
+        if (aSkill && !bSkill) return -1;
+        if (!aSkill && bSkill) return 1;
+
+        // Newer first
         return b.createdAt.getTime() - a.createdAt.getTime();
       });
   }
