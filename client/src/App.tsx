@@ -8,12 +8,14 @@ import Landing from "@/pages/landing";
 import Register from "@/pages/register";
 import WorkerDashboard from "@/pages/worker-dashboard";
 import BusinessDashboard from "@/pages/business-dashboard";
+import Login from "@/pages/login";
 
 function Router() {
   return (
     <Switch>
       <Route path="/" component={Landing} />
       <Route path="/register/:userType" component={Register} />
+      <Route path="/login" component={Login} />
       <Route path="/worker-dashboard/:userId" component={WorkerDashboard} />
       <Route path="/business-dashboard/:userId" component={BusinessDashboard} />
       <Route component={NotFound} />

@@ -323,7 +323,7 @@ export default function Register() {
 
             <div className="mt-6 text-center">
               <p className="text-gray-600">Already have an account?</p>
-              <Button variant="link" className="text-primary font-semibold">
+              <Button variant="link" className="text-primary font-semibold" onClick={() => setLocation('/login')}>
                 Sign In
               </Button>
             </div>
